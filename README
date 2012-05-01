@@ -1,0 +1,7 @@
+Application to collect tweets from celebs and their fans 
+
+- Java
+- Apache MQ
+
+
+Two java processes run one for persisting and one for streaming
