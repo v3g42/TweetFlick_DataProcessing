@@ -14,6 +14,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoURI;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,9 +34,11 @@ public class DBAdapter {
   public static  ArrayList<DBWord> readDB() {
         ArrayList<DBWord> trends = new ArrayList<DBWord>();
         Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+        MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_TRENDS_COLL"));
             DBCursor cur = coll.find();
             while (cur.hasNext()) {
@@ -58,17 +62,18 @@ public class DBAdapter {
         } catch (Exception e) {
             System.out.println("Ex in DBAdapter:" + e);
         } finally {
-            mongo.close();
+           // mongo.close();
         }
         return trends;
 
     }
 
    static void updateTrends( ArrayList<DBWord> trends) {
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+	   MongoURI uri;
+       try {            
+           uri = new MongoURI(SettingsMap.get("DB_URI"));
+       	DB db = uri.connectDB();
+       	db.authenticate(uri.getUsername(), uri.getPassword());
 
             DBCollection coll = db.getCollection(SettingsMap.get("DB_TRENDS_COLL"));
             coll.rename(SettingsMap.get("DB_TRENDS_COLL_BCK"), true);
@@ -88,7 +93,7 @@ public class DBAdapter {
 
             System.out.println("ex in updateCelebs:" + e);
         } finally {
-            mongo.close();
+            //uri.close();
         }
     }
 }

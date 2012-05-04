@@ -11,6 +11,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoURI;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,9 +37,11 @@ public class DBActions {
         ArrayList<Object> useridObjs = new ArrayList<Object>();
         long[] userids = null;
         Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+        MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             BasicDBObject fieldsToretrieve = new BasicDBObject();
             fieldsToretrieve.put("_id", 1);
@@ -53,17 +57,18 @@ public class DBActions {
         } catch (Exception e) {
             System.out.println("ex in getUserIds:" + e);
         } finally {
-            mongo.close();
+         //   mongo.close();
         }
         return userids;
     }
 
     static Map<String, Long> getCelebsForReply() {
         HashMap<String, Long> celebs = new HashMap<String, Long>();
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+        MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             DBCursor cur = coll.find();
 
@@ -77,7 +82,7 @@ public class DBActions {
         } catch (Exception e) {
             System.out.println("ex in getCelebsForReply:" + e);
         } finally {
-            mongo.close();
+         //   mongo.close();
         }
         return celebs;
     }
@@ -85,10 +90,11 @@ public class DBActions {
     //used in persistTweets
     static Map<Long, DBObject> getCelebs() {
         HashMap<Long, DBObject> celebs = new HashMap<Long, DBObject>();
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+        MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             DBCursor cur = coll.find();
 
@@ -101,7 +107,7 @@ public class DBActions {
         } catch (Exception e) {
             System.out.println("ex in getCelebs:" + e);
         } finally {
-            mongo.close();
+            //mongo.close();
         }
         return celebs;
 
@@ -109,10 +115,11 @@ public class DBActions {
 // used in persistTweets
 
     static void updateCelebs(Map<Long, DBObject> celebs) {
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+    	MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             Map<Long, DBObject> celebsDb = getCelebs();
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             coll.rename(SettingsMap.get("DB_CELEBS_COLL_BCK"), true);
@@ -132,15 +139,16 @@ public class DBActions {
 
             System.out.println("ex in updateCelebs:" + e);
         } finally {
-            mongo.close();
+          //  mongo.close();
         }
     }
 
     static void insertTweet(long tweetId, String text, long celeb_id, long time,String geo, String inReplyTo,long inReplyToTweet) {
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+    	MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = null;
             BasicDBObject doc = new BasicDBObject();
             BasicDBObject indexes = new BasicDBObject();
@@ -165,15 +173,16 @@ public class DBActions {
         } catch (Exception e) {
             System.out.println("ex in insertTweet:" + e);
         } finally {
-            mongo.close();
+            //mongo.close();
         }
     }
 
     static void insertFanTweet(long tweetId, String text, long fanId, String fanName, String fanScreenName, String profilePicUrl, long time, String inReplyTo,long inReplyToTweet) {
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+    	MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = null;
             BasicDBObject doc = new BasicDBObject();
             BasicDBObject indexes = new BasicDBObject();
@@ -196,15 +205,16 @@ public class DBActions {
         } catch (Exception e) {
             System.out.println("ex in insertFanTweet:" + e);
         } finally {
-            mongo.close();
+           // mongo.close();
         }
     }
 
     static void insertTweets(BasicDBObject[] docs) {
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+    	MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_TWEETS_COLL"));
 
             coll.insert(docs);
@@ -218,15 +228,16 @@ public class DBActions {
         } catch (Exception e) {
             System.out.println("ex in batch insert tweets:" + e);
         } finally {
-            mongo.close();
+          //  mongo.close();
         }
     }
 
     static void insertUser(long userId, String userName, String screenName, String profileImgUrl,String description, long created, int followers, int friends, int statuses, String location, boolean verified, ArrayList<String> tags) {
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+    	MongoURI uri;
+        try {            
+            uri = new MongoURI(SettingsMap.get("DB_URI"));
+        	DB db = uri.connectDB();
+        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
 
             int isVerified = (verified ? 1 : 0);
@@ -255,14 +266,15 @@ public class DBActions {
         } catch (Exception e) {
             System.out.println("ex in insert user:" + e);
         } finally {
-            mongo.close();
+          //  mongo.close();
         }
     }
 static void insertPic(long tweetId, String[] urls,long celeb_id, String screenName, String name,long time ) {
-        Mongo mongo = null;
-        try {
-            mongo = new Mongo(SettingsMap.get("DB_LOCATION"), 27017);
-            DB db = mongo.getDB(SettingsMap.get("DB_NAME"));
+	MongoURI uri;
+    try {            
+        uri = new MongoURI(SettingsMap.get("DB_URI"));
+    	DB db = uri.connectDB();
+    	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = null;
             BasicDBObject doc = new BasicDBObject();
             BasicDBObject indexes = new BasicDBObject();
@@ -288,7 +300,7 @@ static void insertPic(long tweetId, String[] urls,long celeb_id, String screenNa
         } catch (Exception e) {
             System.out.println("ex in insertPic:" + e);
         } finally {
-            mongo.close();
+          //  mongo.close();
         }
     }
 
