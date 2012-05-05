@@ -14,8 +14,10 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 import com.mongodb.MongoURI;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,15 +32,22 @@ import org.bson.types.ObjectId;
  * @author Karthik
  */
 public class DBAdapter {
-
+	static MongoURI uri;
+    static DB db;
+    static {
+    	 uri = new MongoURI(SettingsMap.get("DB_URI"));
+	try {
+		db = uri.connectDB();
+		db.authenticate(uri.getUsername(), uri.getPassword());
+	} catch (MongoException e) {
+		e.printStackTrace();
+	} catch (UnknownHostException e) {
+		e.printStackTrace();
+	}
+    }
   public static  ArrayList<DBWord> readDB() {
         ArrayList<DBWord> trends = new ArrayList<DBWord>();
-        Mongo mongo = null;
-        MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_TRENDS_COLL"));
             DBCursor cur = coll.find();
             while (cur.hasNext()) {
@@ -69,11 +78,7 @@ public class DBAdapter {
     }
 
    static void updateTrends( ArrayList<DBWord> trends) {
-	   MongoURI uri;
        try {            
-           uri = new MongoURI(SettingsMap.get("DB_URI"));
-       	DB db = uri.connectDB();
-       	db.authenticate(uri.getUsername(), uri.getPassword());
 
             DBCollection coll = db.getCollection(SettingsMap.get("DB_TRENDS_COLL"));
             coll.rename(SettingsMap.get("DB_TRENDS_COLL_BCK"), true);

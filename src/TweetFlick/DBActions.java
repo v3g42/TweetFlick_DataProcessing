@@ -11,8 +11,10 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 import com.mongodb.MongoURI;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +29,20 @@ import org.bson.types.ObjectId;
 public class DBActions {
 
     static HashMap<String, ObjectId> keywordToId = new HashMap<String, ObjectId>();
-
+    static MongoURI uri;
+    static DB db;
+    static {
+    	 uri = new MongoURI(SettingsMap.get("DB_URI"));
+	try {
+		db = uri.connectDB();
+		db.authenticate(uri.getUsername(), uri.getPassword());
+	} catch (MongoException e) {
+		e.printStackTrace();
+	} catch (UnknownHostException e) {
+		e.printStackTrace();
+	}
+	
+    }
     public static void main(String[] args) {
 //        insertUser(new Long("12121"), "gen", "", new Long("1212"), null);
     }
@@ -36,12 +51,9 @@ public class DBActions {
     static long[] getUserIds() {
         ArrayList<Object> useridObjs = new ArrayList<Object>();
         long[] userids = null;
-        Mongo mongo = null;
-        MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
+            
+
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             BasicDBObject fieldsToretrieve = new BasicDBObject();
             fieldsToretrieve.put("_id", 1);
@@ -64,11 +76,7 @@ public class DBActions {
 
     static Map<String, Long> getCelebsForReply() {
         HashMap<String, Long> celebs = new HashMap<String, Long>();
-        MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             DBCursor cur = coll.find();
 
@@ -90,11 +98,7 @@ public class DBActions {
     //used in persistTweets
     static Map<Long, DBObject> getCelebs() {
         HashMap<Long, DBObject> celebs = new HashMap<Long, DBObject>();
-        MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             DBCursor cur = coll.find();
 
@@ -115,11 +119,7 @@ public class DBActions {
 // used in persistTweets
 
     static void updateCelebs(Map<Long, DBObject> celebs) {
-    	MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
             Map<Long, DBObject> celebsDb = getCelebs();
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
             coll.rename(SettingsMap.get("DB_CELEBS_COLL_BCK"), true);
@@ -146,9 +146,6 @@ public class DBActions {
     static void insertTweet(long tweetId, String text, long celeb_id, long time,String geo, String inReplyTo,long inReplyToTweet) {
     	MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = null;
             BasicDBObject doc = new BasicDBObject();
             BasicDBObject indexes = new BasicDBObject();
@@ -178,11 +175,7 @@ public class DBActions {
     }
 
     static void insertFanTweet(long tweetId, String text, long fanId, String fanName, String fanScreenName, String profilePicUrl, long time, String inReplyTo,long inReplyToTweet) {
-    	MongoURI uri;
-        try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
+        try {    
             DBCollection coll = null;
             BasicDBObject doc = new BasicDBObject();
             BasicDBObject indexes = new BasicDBObject();
@@ -212,9 +205,6 @@ public class DBActions {
     static void insertTweets(BasicDBObject[] docs) {
     	MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_TWEETS_COLL"));
 
             coll.insert(docs);
@@ -233,11 +223,7 @@ public class DBActions {
     }
 
     static void insertUser(long userId, String userName, String screenName, String profileImgUrl,String description, long created, int followers, int friends, int statuses, String location, boolean verified, ArrayList<String> tags) {
-    	MongoURI uri;
         try {            
-            uri = new MongoURI(SettingsMap.get("DB_URI"));
-        	DB db = uri.connectDB();
-        	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = db.getCollection(SettingsMap.get("DB_CELEBS_COLL"));
 
             int isVerified = (verified ? 1 : 0);
@@ -270,11 +256,7 @@ public class DBActions {
         }
     }
 static void insertPic(long tweetId, String[] urls,long celeb_id, String screenName, String name,long time ) {
-	MongoURI uri;
     try {            
-        uri = new MongoURI(SettingsMap.get("DB_URI"));
-    	DB db = uri.connectDB();
-    	db.authenticate(uri.getUsername(), uri.getPassword());
             DBCollection coll = null;
             BasicDBObject doc = new BasicDBObject();
             BasicDBObject indexes = new BasicDBObject();
